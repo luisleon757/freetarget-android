@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:freETargetMAUI"
+             xmlns:graphics="clr-namespace:freETargetMAUI.Graphics"
+             x:Class="freETargetMAUI.MainPage">
+
+    <!-- Título Personalizado en Shell -->
+    <Shell.TitleView>
+        <HorizontalStackLayout Padding="20,0" Spacing="35" VerticalOptions="Center">
+            <Label Text="freETarget" FontSize="19" FontAttributes="Bold" TextColor="White" VerticalOptions="Center" />
+            
+            <Border BackgroundColor="#1E293B" StrokeThickness="1" Stroke="#334155" Padding="15,0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="20" />
+                </Border.StrokeShape>
+                <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                    <Label Text="💡 Luz:" VerticalOptions="Center" TextColor="#FCD34D" FontAttributes="Bold" FontSize="13" />
+                    <Picker x:Name="LightIntensityPicker" Title="%" WidthRequest="65" TextColor="#FDE68A" TitleColor="#64748B" SelectedIndexChanged="OnLightIntensityChanged" FontSize="14" HorizontalTextAlignment="Center">
+                        <Picker.Items>
+                            <x:String>0%</x:String>
+                            <x:String>25%</x:String>
+                            <x:String>50%</x:String>
+                            <x:String>75%</x:String>
+                            <x:String>99%</x:String>
+                        </Picker.Items>
+                    </Picker>
+                </HorizontalStackLayout>
+            </Border>
+        </HorizontalStackLayout>
+    </Shell.TitleView>
+
+    <!-- Aplicando tema claro, fondo Slate 50 -->
+    <ContentPage.BackgroundColor>#F4F7FB</ContentPage.BackgroundColor>
+
+    <Grid ColumnDefinitions="*, 400" RowDefinitions="*" Padding="20" ColumnSpacing="25">
+        
+        <!-- Target Area Grid -->
+        <Grid Grid.Column="0">
+            <!-- Target Box -->
+            <Border BackgroundColor="White" StrokeThickness="0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="24" />
+                </Border.StrokeShape>
+                <Border.Shadow>
+                    <Shadow Brush="#000000" Opacity="0.04" Radius="20" Offset="0,10" />
+                </Border.Shadow>
+                
+                <GraphicsView x:Name="TargetGraphicsView" 
+                              HorizontalOptions="Fill" VerticalOptions="Fill"
+                              Margin="20"
+                              StartInteraction="OnTargetInteraction">
+                    <GraphicsView.Drawable>
+                        <graphics:TargetDrawable x:Name="AppTargetDrawable" />
+                    </GraphicsView.Drawable>
+                </GraphicsView>
+            </Border>
+
+
+        </Grid>
+
+        <!-- Right Side Panel -->
+        <Grid Grid.Column="1" RowDefinitions="Auto, *, Auto">
+            
+            <!-- Header & Scoreboard -->
+            <VerticalStackLayout Grid.Row="0" Spacing="10">
+                <Grid ColumnDefinitions="*, Auto">
+                    <Label Grid.Column="0" Text="freETarget" FontSize="22" FontAttributes="Bold" TextColor="#1E293B" VerticalOptions="Center" />
+                    <HorizontalStackLayout Grid.Column="1" Spacing="8" VerticalOptions="Center">
+                        <Ellipse x:Name="ConnectionStatusDot" WidthRequest="10" HeightRequest="10" Fill="#EF4444" VerticalOptions="Center" />
+                        <Label x:Name="ConnectionStatusLabel" Text="Desconectado" FontSize="12" FontAttributes="Bold" TextColor="#64748B" VerticalOptions="Center" />
+                        <Button x:Name="ConnectButton" Text="Conectar WiFi" Clicked="OnConnectClicked" HeightRequest="30" Padding="10,0" CornerRadius="6" BackgroundColor="#10B981" TextColor="White" FontSize="11" FontAttributes="Bold" />
+                    </HorizontalStackLayout>
+                </Grid>
+                
+                <Border BackgroundColor="#FFFFFF" StrokeThickness="0">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="16" />
+                    </Border.StrokeShape>
+                    <Border.Shadow>
+                        <Shadow Brush="#000000" Opacity="0.06" Radius="15" Offset="0,6" />
+                    </Border.Shadow>
+                    
+                    <VerticalStackLayout Spacing="4" Padding="16">
+                        <Label Text="CURRENT EVENT: AIR PISTOL" FontSize="11" FontAttributes="Bold" TextColor="#94A3B8" CharacterSpacing="1.2" />
+                        
+                        <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                            <Label x:Name="IntegerScoreLabel" Text="0" FontSize="48" FontAttributes="Bold" TextColor="#2563EB" />
+                            <Label x:Name="ScoreLabel" Text="(0.0)" FontSize="22" FontAttributes="Bold" TextColor="#94A3B8" VerticalOptions="End" Margin="0,0,0,10"/>
+                            <Label Text="PTS" FontSize="16" FontAttributes="Bold" TextColor="#94A3B8" VerticalOptions="End" Margin="0,0,0,10"/>
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+
+
+                <Label Text="Recent Shots" FontSize="16" FontAttributes="Bold" TextColor="#1E293B" Margin="0,5,0,0" />
+            </VerticalStackLayout>
+
+            <!-- Shots List (Rows of 11: 10 shots + 1 sum) -->
+            <CollectionView x:Name="ShotsListView" Grid.Row="1" SelectionMode="None" Margin="0,15,0,0">
+                <CollectionView.ItemsLayout>
+                    <GridItemsLayout Orientation="Vertical" Span="11" VerticalItemSpacing="8" HorizontalItemSpacing="6" />
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border BackgroundColor="{Binding BackgroundColor}" Stroke="#E2E8F0" StrokeThickness="1" HeightRequest="38">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="4" />
+                            </Border.StrokeShape>
+                            <Label Text="{Binding DisplayText}" FontSize="11" FontAttributes="Bold" TextColor="{Binding TextColor}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <Label x:Name="RawDataDebugLabel" Grid.Row="2" Text="Waiting for data..." FontSize="10" TextColor="Gray" MaxLines="4" Margin="0,10,0,0" Padding="5" BackgroundColor="#11000000"/>
+        </Grid>
+    </Grid>
+
+</ContentPage>
