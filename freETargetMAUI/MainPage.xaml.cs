@@ -63,6 +63,11 @@ public partial class MainPage : ContentPage
         
         AppTargetDrawable.Shots = _domainShots.Skip(skip).ToList(); 
         TargetGraphicsView.Invalidate(); 
+        
+        if (_currentSession != null)
+        {
+            EndSessionButton.IsVisible = _currentSession.sessionType == Event.EventType.Match;
+        }
     }
 
     private async void OnStartEventClicked(object? sender, EventArgs e)
