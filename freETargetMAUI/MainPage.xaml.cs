@@ -203,11 +203,29 @@ public partial class MainPage : ContentPage
     private void LoadShooters()
     {
         var users = _storageController.findAllUsers();
+        
+        string customUsersRaw = Microsoft.Maui.Storage.Preferences.Default.Get("CustomShooters", "");
+        if (!string.IsNullOrEmpty(customUsersRaw)) {
+            var customUsers = customUsersRaw.Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
+            foreach(var cu in customUsers) {
+                if (!users.Contains(cu)) users.Add(cu);
+            }
+        }
+        
         if (!users.Contains("Invitado")) users.Insert(0, "Invitado");
         users.Add("+ Nuevo Tirador");
         
         ShooterPicker.ItemsSource = users;
         ShooterPicker.SelectedItem = _currentShooterName;
+    }
+
+    private void SaveCustomShooter(string newUser) {
+        string customUsersRaw = Microsoft.Maui.Storage.Preferences.Default.Get("CustomShooters", "");
+        var customUsers = customUsersRaw.Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+        if (!customUsers.Contains(newUser)) {
+            customUsers.Add(newUser);
+            Microsoft.Maui.Storage.Preferences.Default.Set("CustomShooters", string.Join("|", customUsers));
+        }
     }
 
     private async void OnShooterChanged(object? sender, EventArgs e)
@@ -222,6 +240,7 @@ public partial class MainPage : ContentPage
             if (!string.IsNullOrWhiteSpace(newUser))
             {
                 _currentShooterName = newUser;
+                SaveCustomShooter(newUser);
                 
                 // Actualizar la UI
                 var items = ShooterPicker.ItemsSource as List<string>;

@@ -166,6 +166,25 @@ namespace freETarget {
             return ret;
         }
 
+        public List<string> findAllUsers() {
+            SqliteConnection con = new SqliteConnection(connString);
+            con.Open();
+            try {
+                SqliteCommand cmd = new SqliteCommand("select distinct user from Sessions where user is not null and user != ''", con);
+                SqliteDataReader rdr = cmd.ExecuteReader();
+                List<string> ret = new List<string>();
+                while (rdr.Read()) {
+                    ret.Add(rdr.GetString(0));
+                }
+                rdr.Close();
+                return ret;
+            } catch {
+                return new List<string>();
+            } finally {
+                con.Close();
+            }
+        }
+        
         public List<SessionSummary> findAllSessionSummariesForUser(string user) {
             SqliteConnection con = new SqliteConnection(connString);
             con.Open();
