@@ -15,125 +15,38 @@ namespace freETarget {
     public class StorageController {
 
         private string connString = null;
-        private string templateConnString = "Data Source=.\\Storage.db;";
         private Action<string> logAction = null;
 
         private bool initiated = false;
 
         private string getDBPath() {
-            return Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\freETarget\\database";
+            return Path.Combine(Microsoft.Maui.Storage.FileSystem.AppDataDirectory, "Storage.db");
         }
-
 
         public StorageController(Action<string> logAction = null) {
             this.logAction = logAction;
+        }
+
+        public async Task<string> InitializeAsync(int required_version = 1) { // Defaulting required_version because we might not use checkDB directly anymore
             try {
                 string dbPath = getDBPath();
-                if (Directory.Exists(dbPath) == false) {
-                    Directory.CreateDirectory(dbPath);
-                    File.Copy(".\\Storage.db", dbPath + "\\Storage.db");
-                    logAction?.Invoke("Database directory created at: " + dbPath);
-                    //displayMessage("Database directory created at: " + dbPath, false);
-                } else if (File.Exists(dbPath + "\\Storage.db") == false) {
-                    //the directory exists, but someone deleted the DB file :(
-                    File.Copy(".\\Storage.db", dbPath + "\\Storage.db");
-                    logAction?.Invoke("Database file copied at: " + dbPath);
-                    //displayMessage("Database file copied at: " + dbPath, false);
+                if (!File.Exists(dbPath)) {
+                    using var stream = await Microsoft.Maui.Storage.FileSystem.OpenAppPackageFileAsync("Storage.db");
+                    using var memoryStream = new MemoryStream();
+                    await stream.CopyToAsync(memoryStream);
+                    File.WriteAllBytes(dbPath, memoryStream.ToArray());
+                    logAction?.Invoke("Database file extracted to: " + dbPath);
                 }
 
-                connString = "Data Source=" + dbPath + "\\Storage.db;";
-
+                connString = "Data Source=" + dbPath + ";";
                 initiated = true;
-            }catch(Exception ex) {
-                logAction?.Invoke("Exception in StorageController constructor: " + ex.Message);
+                return null;
+            } catch(Exception ex) {
+                logAction?.Invoke("Exception in StorageController InitializeAsync: " + ex.Message);
+                return ex.Message;
             }
         }
 
-        public String checkDB(int required_version) {
-            if (initiated == false) {
-                return "StorageController constructor not initialized. Check the log.";
-            }
-
-            bool templateOK = false;
-            bool userOK = false;
-
-            int objCon=-1;
-            int obj=-1;
-
-            try {
-                //step1: check if template database exists. if yes, get version
-
-                SqliteConnection tempCon = new SqliteConnection(templateConnString);
-                tempCon.Open();
-                SqliteCommand cmdCon = new SqliteCommand("select version from Version", tempCon);
-                objCon = Convert.ToInt32(cmdCon.ExecuteScalar());
-
-                tempCon.Close();
-                templateOK = true;
-            } catch (Exception ex) {
-                logAction?.Invoke("Template database exception: " + ex.Message +
-                    Environment.NewLine + "Template connection string: " + templateConnString +
-                    Environment.NewLine + "User connection string: " + connString +
-                    Environment.NewLine + ex.ToString());
-                //return ex.Message;
-            }
-
-            //step2: check if user database exists. if yes, get version from user database
-
-            try {
-
-                SqliteConnection con = new SqliteConnection(connString);
-                con.Open();
-                SqliteCommand cmd = new SqliteCommand("select version from Version", con);
-                obj = Convert.ToInt32(cmd.ExecuteScalar());
-
-                con.Close();
-                userOK = true;
-            } catch (Exception ex) {
-                logAction?.Invoke("User database exception: " + ex.Message +
-                    Environment.NewLine + "Template connection string: " + templateConnString +
-                    Environment.NewLine + "User connection string: " + connString +
-                    Environment.NewLine + ex.ToString());
-                //return ex.Message;
-            }
-
-
-
-            logAction?.Invoke("Template database version = " + objCon + "   -   User database version = " + obj);
-
-            //step3: compare versions. if different, copy template over user database
-
-            string dbPath = getDBPath();
-            if (userOK) {
-                
-                if (objCon != obj) {
-                    logAction?.Invoke("WARNING - User database at '" + dbPath + "\\Storage.db' is a different version than this installation requires. OVERWRITING automatically.");
-
-                    File.Copy(".\\Storage.db", dbPath + "\\Storage.db", true);
-                    logAction?.Invoke("Database version mismatch.  '" + dbPath + "\\Storage.db' overwritten with local template");
-                }
-
-                //displayMessage("User database at: " + dbPath, false);
-                logAction?.Invoke("User database at: " + dbPath);
-            } else {
-                //user database not available
-                if (templateOK && objCon==required_version) {
-                    //template database is available. use that
-                    connString = templateConnString;
-                    logAction?.Invoke("WARNING - User database at '" + dbPath + "\\Storage.db' is not accesible. Using template database in the installation folder.");
-
-                    //displayMessage("Using template database in the current/installation directory", false);
-                    logAction?.Invoke("Using template database in the current/installation directory " + connString);
-                } else {
-                    // neither databases are available
-                    //displayMessage("Exception accessing both user and template databases. Check log for exact error", false);
-                    logAction?.Invoke("Exception accessing both user and template databases. Check log for exact error" + Environment.NewLine + "Required version: " + required_version + " - template version: " + objCon);
-                    return "Exception accessing both user and template databases. Check log for exact error";
-                }
-            }
-
-            return null;
-        }
 
         public List<string> findAllUsers() {
             SqliteConnection con = new SqliteConnection(connString);
