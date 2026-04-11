@@ -166,6 +166,32 @@ namespace freETarget {
             return ret;
         }
 
+        public List<SessionSummary> findAllSessionSummariesForUser(string user) {
+            SqliteConnection con = new SqliteConnection(connString);
+            con.Open();
+            SqliteCommand cmd = new SqliteCommand("select s.id, s.startTime, s.score, s.decimalScore, s.innerX, e.Name, s.courseOfFire " +
+                "from Sessions s LEFT JOIN Events e on s.courseOfFire = e.id " +
+                "where s.user = @user order by s.id desc", con);
+            cmd.Parameters.AddWithValue("@user", user);
+            SqliteDataReader rdr = cmd.ExecuteReader();
+            List<SessionSummary> ret = new List<SessionSummary>();
+            while (rdr.Read()) {
+                SessionSummary item = new SessionSummary();
+                item.Id = rdr.GetInt64(0);
+                DateTime d = convertStringToDate(rdr.GetString(1));
+                item.DateStr = d.ToString("dd/MM/yyyy HH:mm");
+                item.Score = rdr.GetInt32(2);
+                item.DecimalScore = rdr.GetDecimal(3);
+                item.InnerX = rdr.GetInt32(4);
+                item.EventName = rdr.IsDBNull(5) ? "Desconocido" : rdr.GetString(5);
+                item.EventId = rdr.IsDBNull(6) ? 0 : rdr.GetInt64(6);
+                ret.Add(item);
+            }
+            rdr.Close();
+            con.Close();
+            return ret;
+        }
+
         public List<decimal> findScoresForUser(string user, Event eventType) {
             SqliteConnection con = new SqliteConnection(connString);
             con.Open();
@@ -252,11 +278,17 @@ namespace freETarget {
             SqliteDataReader rdr = cmd.ExecuteReader();
             rdr.Read();
 
-            Event cof = null; /* TODO mainWindow.eventManager.findEventByID */ //(rdr.GetInt64(0));
+            long courseOfFireId = rdr.GetInt64(0);
+            Event cof = null;
+            var allEvents = loadEvents();
+            foreach (var e in allEvents) {
+                if (e.ID == courseOfFireId) {
+                    cof = e;
+                    break;
+                }
+            }
             if (cof == null) {
-                System.Diagnostics.StackTrace t = new System.Diagnostics.StackTrace();
-                logAction?.Invoke("Could not find event with id " + rdr.GetInt64(0) + Environment.NewLine + t.ToString());
-                return null;
+                cof = new Event(courseOfFireId, "Desc", false, Event.EventType.Practice, 10, new freETarget.targets.AirPistol(4.5m), 60, 4.5m, 0, 0, 0, 0, 0, Microsoft.Maui.Graphics.Colors.Transparent, false, 0, 0, 0, 0, 0);
             }
 
             int numberOfShots = rdr.GetInt32(1);
@@ -771,6 +803,20 @@ namespace freETarget {
         }
         public override string ToString() {
             return date + " (" + id + ")" + "\t" + score;
+        }
+    }
+
+    public class SessionSummary {
+        public long Id { get; set; }
+        public string DateStr { get; set; }
+        public int Score { get; set; }
+        public decimal DecimalScore { get; set; }
+        public int InnerX { get; set; }
+        public string EventName { get; set; }
+        public long EventId { get; set; }
+
+        public string PresentationText { 
+            get { return $"{EventName} - {Score} pts ({DecimalScore:F1}) - {InnerX}x"; }
         }
     }
 }

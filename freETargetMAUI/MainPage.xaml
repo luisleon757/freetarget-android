@@ -27,6 +27,16 @@
                     </Picker>
                 </HorizontalStackLayout>
             </Border>
+
+            <Border BackgroundColor="#1E293B" StrokeThickness="1" Stroke="#334155" Padding="15,0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="20" />
+                </Border.StrokeShape>
+                <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                    <Label Text="👤 Tirador:" VerticalOptions="Center" TextColor="#60A5FA" FontAttributes="Bold" FontSize="13" />
+                    <Picker x:Name="ShooterPicker" Title="Seleccionar" WidthRequest="160" TextColor="#93C5FD" TitleColor="#64748B" SelectedIndexChanged="OnShooterChanged" FontSize="14" HorizontalTextAlignment="Center" />
+                </HorizontalStackLayout>
+            </Border>
         </HorizontalStackLayout>
     </Shell.TitleView>
 
@@ -89,6 +99,11 @@
                             <Label x:Name="ScoreLabel" Text="(0.0)" FontSize="22" FontAttributes="Bold" TextColor="#94A3B8" VerticalOptions="End" Margin="0,0,0,10"/>
                             <Label Text="PTS" FontSize="16" FontAttributes="Bold" TextColor="#94A3B8" VerticalOptions="End" Margin="0,0,0,10"/>
                         </HorizontalStackLayout>
+                        
+                        <Grid ColumnDefinitions="*, *" ColumnSpacing="8" Margin="0,10,0,0">
+                            <Button Grid.Column="0" x:Name="EndSessionButton" Text="Guardar Sesión" Clicked="OnEndSessionClicked" BackgroundColor="#F59E0B" TextColor="White" FontSize="13" FontAttributes="Bold" CornerRadius="8" HeightRequest="40" />
+                            <Button Grid.Column="1" x:Name="HistoryButton" Text="Ver Historial" Clicked="OnHistoryClicked" BackgroundColor="#3B82F6" TextColor="White" FontSize="13" FontAttributes="Bold" CornerRadius="8" HeightRequest="40" />
+                        </Grid>
                     </VerticalStackLayout>
                 </Border>
 

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="freETargetMAUI.HistoryPage"
+             Title="Historial de Sesiones"
+             BackgroundColor="#F4F7FB">
+
+    <Grid RowDefinitions="Auto, *, Auto" Padding="20">
+        
+        <!-- Cabecera -->
+        <VerticalStackLayout Grid.Row="0" Spacing="5" Margin="0,0,0,20">
+            <Label x:Name="ShooterLabel" Text="Historial de Sesiones" FontSize="26" FontAttributes="Bold" TextColor="#1E293B" />
+            <Label Text="Selecciona una sesión de la lista para cargarla en la diana y continuar tirando o revisarla." FontSize="14" TextColor="#64748B" />
+        </VerticalStackLayout>
+        
+        <!-- Lista de Sesiones -->
+        <CollectionView x:Name="SessionsList" Grid.Row="1" SelectionMode="Single" SelectionChanged="OnSessionSelected">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Border BackgroundColor="White" StrokeThickness="1" Stroke="#E2E8F0" Margin="0,0,0,10">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="12" />
+                        </Border.StrokeShape>
+                        <Border.Shadow>
+                            <Shadow Brush="#000000" Opacity="0.05" Radius="10" Offset="0,4" />
+                        </Border.Shadow>
+                        <Grid ColumnDefinitions="*, Auto" Padding="15">
+                            <VerticalStackLayout Grid.Column="0" Spacing="4" VerticalOptions="Center">
+                                <Label Text="{Binding PresentationText}" FontSize="18" FontAttributes="Bold" TextColor="#2563EB" />
+                                <Label Text="{Binding DateStr}" FontSize="13" TextColor="#94A3B8" />
+                            </VerticalStackLayout>
+                            <Button Grid.Column="1" Text="Cargar Sesión" BackgroundColor="#10B981" TextColor="White" CornerRadius="8" HeightRequest="40" Margin="10,0,0,0" VerticalOptions="Center" CommandParameter="{Binding Id}" Clicked="OnLoadSessionClicked" FontAttributes="Bold" />
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+            <CollectionView.EmptyView>
+                <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="10">
+                    <Label Text="📭" FontSize="50" HorizontalOptions="Center" />
+                    <Label Text="Este tirador aún no tiene sesiones guardadas." FontSize="16" TextColor="#94A3B8" HorizontalOptions="Center" />
+                </VerticalStackLayout>
+            </CollectionView.EmptyView>
+        </CollectionView>
+
+        <!-- Botón Cerrar -->
+        <Button Grid.Row="2" Text="Cerrar Historial" Clicked="OnCloseClicked" BackgroundColor="#EF4444" TextColor="White" FontSize="16" FontAttributes="Bold" CornerRadius="12" HeightRequest="50" Margin="0,20,0,0" />
+
+    </Grid>
+</ContentPage>

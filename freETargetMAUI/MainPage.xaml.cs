@@ -17,12 +17,15 @@ public partial class MainPage : ContentPage
     private List<Shot> _domainShots;
     private ObservableCollection<ShotViewModel> _shotsUI;
     private int _shotCounter = 0;
+    private string _currentShooterName = "Invitado";
     private Random _random = new Random();
     private TargetConnectionService _connectionService;
+    private freETarget.StorageController _storageController;
 
-    public MainPage()
+    public MainPage(freETarget.StorageController storageController)
     {
         InitializeComponent();
+        _storageController = storageController;
         
         _domainShots = new List<Shot>();
         _shotsUI = new ObservableCollection<ShotViewModel>();
@@ -41,7 +44,7 @@ public partial class MainPage : ContentPage
         _currentTarget = new AirPistol(4.5m);
         
         Event ev = new Event(-1, "Training", false, Event.EventType.Practice, 10, _currentTarget, 60, 4.5m, 0, 0, 0, 0, 0, Colors.Transparent, false, 0, 0, 0, 0, 0);
-        _currentSession = Session.createNewSession(ev, "Test User");
+        _currentSession = Session.createNewSession(ev, _currentShooterName);
         
         AppTargetDrawable.Target = _currentTarget;
         AppTargetDrawable.CurrentSession = _currentSession;
@@ -62,9 +65,32 @@ public partial class MainPage : ContentPage
         TargetGraphicsView.Invalidate(); 
     }
 
-    private void OnStartEventClicked(object? sender, EventArgs e)
+    private async void OnStartEventClicked(object? sender, EventArgs e)
     {
         // Placeholder for Event Configuration dialog or screen
+    }
+
+    private async void OnEndSessionClicked(object? sender, EventArgs e)
+    {
+        if (_domainShots.Count > 0)
+        {
+            _currentSession.endTime = DateTime.Now;
+            _currentSession.Shots = _domainShots.ToList();
+            _storageController.storeSession(_currentSession, true);
+            await DisplayAlert("Sesión Guardada", $"Se han guardado {_domainShots.Count} disparos.", "Aceptar");
+            
+            // Reiniciar sesión visualmente
+            _domainShots.Clear();
+            _shotsUI.Clear();
+            _shotCounter = 0;
+            _currentSession = Session.createNewSession(_currentSession.eventType, _currentSession.user);
+            AppTargetDrawable.CurrentSession = _currentSession;
+            UpdateUI();
+        }
+        else
+        {
+            await DisplayAlert("Atención", "No hay disparos en la sesión actual.", "Aceptar");
+        }
     }
 
     private async void OnConnectClicked(object? sender, EventArgs e)
@@ -153,7 +179,7 @@ public partial class MainPage : ContentPage
     {
         if (LightIntensityPicker.SelectedIndex == -1) return;
         
-        string? selected = LightIntensityPicker.Items[LightIntensityPicker.SelectedIndex];
+        string? selected = (string)LightIntensityPicker.Items[LightIntensityPicker.SelectedIndex];
         int val = 0;
         
         if (selected == "99%") val = 99;
@@ -166,6 +192,56 @@ public partial class MainPage : ContentPage
         {
             string cmd = $"{{\"LED_BRIGHT\": {val}}}";
             await _connectionService.SendMessageAsync(cmd);
+        }
+    }
+
+    private void LoadShooters()
+    {
+        var users = _storageController.findAllUsers();
+        if (!users.Contains("Invitado")) users.Insert(0, "Invitado");
+        users.Add("+ Nuevo Tirador");
+        
+        ShooterPicker.ItemsSource = users;
+        ShooterPicker.SelectedItem = _currentShooterName;
+    }
+
+    private async void OnShooterChanged(object? sender, EventArgs e)
+    {
+        if (ShooterPicker.SelectedIndex == -1) return;
+        
+        string selectedUser = (string)ShooterPicker.SelectedItem;
+        
+        if (selectedUser == "+ Nuevo Tirador")
+        {
+            string newUser = await DisplayPromptAsync("Nuevo Tirador", "Introduce el nombre del nuevo tirador:", "Aceptar", "Cancelar");
+            if (!string.IsNullOrWhiteSpace(newUser))
+            {
+                _currentShooterName = newUser;
+                
+                // Actualizar la UI
+                var items = ShooterPicker.ItemsSource as List<string>;
+                if (items != null)
+                {
+                    items.Insert(items.Count - 1, newUser);
+                    ShooterPicker.ItemsSource = null; // Forza recarga visual
+                    ShooterPicker.ItemsSource = items;
+                }
+                ShooterPicker.SelectedItem = newUser;
+            }
+            else
+            {
+                // Revert to previous selected
+                ShooterPicker.SelectedItem = _currentShooterName;
+            }
+        }
+        else
+        {
+            _currentShooterName = selectedUser;
+        }
+        
+        if (_currentSession != null)
+        {
+            _currentSession.user = _currentShooterName;
         }
     }
 
@@ -187,5 +263,59 @@ public partial class MainPage : ContentPage
                 await DisplayAlert("Modo Competición", "La competición ha iniciado. Dispones de 60 disparos.", "Aceptar");
             }
         }
+    }
+
+    private async void OnHistoryClicked(object? sender, EventArgs e)
+    {
+        var historyPage = new HistoryPage(_storageController, _currentShooterName);
+        historyPage.OnSessionToLoad += (s, session) => {
+            LoadSessionIntoMainPage(session);
+        };
+        await Navigation.PushModalAsync(historyPage);
+    }
+
+    private void LoadSessionIntoMainPage(Session session)
+    {
+        _currentSession = session;
+        _currentShooterName = session.user;
+        
+        if (ShooterPicker.Items.Contains(_currentShooterName))
+        {
+            ShooterPicker.SelectedItem = _currentShooterName;
+        }
+        
+        _domainShots.Clear();
+        _shotsUI.Clear();
+        _shotCounter = 0;
+        
+        foreach (var shot in session.Shots)
+        {
+            _domainShots.Add(shot);
+            _shotCounter = Math.Max(_shotCounter, shot.count);
+            
+            _shotsUI.Add(new ShotViewModel
+            {
+                Shot = shot,
+                DisplayText = shot.decimalScore.ToString("F1"),
+                IsLatest = false,
+                IsSum = false
+            });
+        }
+        
+        if (session.eventType != null && session.eventType.Target != null) {
+            _currentTarget = session.eventType.Target;
+        }
+        
+        AppTargetDrawable.Target = _currentTarget;
+        AppTargetDrawable.CurrentSession = _currentSession;
+        
+        UpdateUI();
+    }
+
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+        await _storageController.InitializeAsync();
+        LoadShooters();
     }
 }
