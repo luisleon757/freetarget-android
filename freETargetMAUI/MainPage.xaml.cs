@@ -297,13 +297,20 @@ public partial class MainPage : ContentPage
         }
     }
 
-    private async void OnHistoryClicked(object? sender, EventArgs e)
+    private async void OnHistoryClicked(object sender, EventArgs e)
     {
         var historyPage = new HistoryPage(_storageController, _currentShooterName);
         historyPage.OnSessionToLoad += (s, session) => {
             LoadSessionIntoMainPage(session);
         };
         await Navigation.PushModalAsync(historyPage);
+    }
+
+    private async void OnAnalyticsClicked(object sender, EventArgs e)
+    {
+        var analyticsPage = new AnalyticsPage();
+        analyticsPage.InitializeWithStorage(_storageController, _currentShooterName);
+        await Navigation.PushModalAsync(analyticsPage);
     }
 
     private void LoadSessionIntoMainPage(Session session)

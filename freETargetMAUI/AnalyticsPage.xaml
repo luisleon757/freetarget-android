@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:microcharts="clr-namespace:Microcharts.Maui;assembly=Microcharts.Maui"
+             xmlns:graphics="clr-namespace:freETargetMAUI.Graphics"
+             x:Class="freETargetMAUI.AnalyticsPage"
+             Title="Panel de Estadísticas"
+             BackgroundColor="#1E293B">
+
+    <ScrollView>
+        <Grid RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto" Padding="20">
+            
+            <!-- Cabecera -->
+            <VerticalStackLayout Grid.Row="0" Spacing="5" Margin="0,0,0,20">
+                <Label Text="freETarget Analytics" FontSize="26" FontAttributes="Bold" TextColor="White" />
+                <Label Text="Analiza tu rendimiento y descubre tus tendencias de disparo." FontSize="14" TextColor="#94A3B8" />
+            </VerticalStackLayout>
+
+            <!-- Selector de Tirador -->
+            <Border Grid.Row="1" BackgroundColor="#334155" StrokeShape="RoundRectangle 12" StrokeThickness="0" Padding="15" Margin="0,0,0,20">
+                <HorizontalStackLayout Spacing="15" VerticalOptions="Center">
+                    <Label Text="👤" FontSize="20" VerticalOptions="Center"/>
+                    <Picker x:Name="ShooterPicker" Title="Seleccionar Tirador" SelectedIndexChanged="OnShooterSelected" TextColor="White" TitleColor="#94A3B8" WidthRequest="200" VerticalOptions="Center" />
+                </HorizontalStackLayout>
+            </Border>
+
+            <!-- Indicadores Clave de Rendimiento (KPIs) -->
+            <Grid Grid.Row="2" ColumnDefinitions="*, *, *" ColumnSpacing="10" Margin="0,0,0,20">
+                <Border Grid.Column="0" BackgroundColor="#334155" StrokeShape="RoundRectangle 12" StrokeThickness="0" Padding="15">
+                    <VerticalStackLayout>
+                        <Label Text="Media Sesión" FontSize="12" TextColor="#94A3B8" />
+                        <Label x:Name="MediaScoreLabel" Text="-" FontSize="24" FontAttributes="Bold" TextColor="#10B981" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Column="1" BackgroundColor="#334155" StrokeShape="RoundRectangle 12" StrokeThickness="0" Padding="15">
+                    <VerticalStackLayout>
+                        <Label Text="Mejor Sesión" FontSize="12" TextColor="#94A3B8" />
+                        <Label x:Name="BestScoreLabel" Text="-" FontSize="24" FontAttributes="Bold" TextColor="#F59E0B" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Column="2" BackgroundColor="#334155" StrokeShape="RoundRectangle 12" StrokeThickness="0" Padding="15">
+                    <VerticalStackLayout>
+                        <Label Text="Agrupación Ø" FontSize="12" TextColor="#94A3B8" />
+                        <Label x:Name="AvgGroupLabel" Text="-" FontSize="24" FontAttributes="Bold" TextColor="#3B82F6" />
+                    </VerticalStackLayout>
+                </Border>
+            </Grid>
+
+            <!-- Gráfico de Evolución -->
+            <Border Grid.Row="3" BackgroundColor="#334155" StrokeShape="RoundRectangle 12" StrokeThickness="0" Padding="15" Margin="0,0,0,20">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Evolución de Puntuación Decimal" FontSize="16" FontAttributes="Bold" TextColor="White" />
+                    <microcharts:ChartView x:Name="EvolutionChart" HeightRequest="200" BackgroundColor="Transparent" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Mapa Estelar de Impactos -->
+            <Border Grid.Row="4" BackgroundColor="#334155" StrokeShape="RoundRectangle 12" StrokeThickness="0" Padding="15" Margin="0,0,0,20">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Mapa de Calor de Agrupación (Últimos tiros)" FontSize="16" FontAttributes="Bold" TextColor="White" />
+                    <!-- Diana donde pintaremos todos los disparos superpuestos -->
+                    <GraphicsView x:Name="HeatmapGraphicsView" Drawable="{Binding HeatmapDrawable}" HeightRequest="300" WidthRequest="300" HorizontalOptions="Center" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Botón Cerrar -->
+            <Button Grid.Row="5" Text="Cerrar Estadísticas" Clicked="OnCloseClicked" BackgroundColor="#EF4444" TextColor="White" FontSize="16" FontAttributes="Bold" CornerRadius="12" HeightRequest="50" Margin="0,0,0,20" />
+            
+        </Grid>
+    </ScrollView>
+</ContentPage>
