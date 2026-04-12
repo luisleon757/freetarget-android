@@ -81,8 +81,16 @@ public partial class MainPage : ContentPage
         {
             _currentSession.endTime = DateTime.Now;
             _currentSession.Shots = _domainShots.ToList();
-            _storageController.storeSession(_currentSession, true);
-            await DisplayAlert("Sesión Guardada", $"Se han guardado {_domainShots.Count} disparos.", "Aceptar");
+            if (_currentSession.id > 0)
+            {
+                _storageController.updateSession(_currentSession);
+                await DisplayAlert("Sesión Actualizada", $"Se han guardado {_domainShots.Count} disparos en tu sesión existente.", "Aceptar");
+            }
+            else
+            {
+                _storageController.storeSession(_currentSession, true);
+                await DisplayAlert("Sesión Guardada", $"Se han guardado {_domainShots.Count} disparos en una nueva sesión.", "Aceptar");
+            }
             
             // Reiniciar sesión visualmente
             _domainShots.Clear();

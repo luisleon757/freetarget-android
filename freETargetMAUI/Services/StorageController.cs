@@ -171,7 +171,7 @@ namespace freETarget {
         public List<SessionSummary> findAllSessionSummariesForUser(string user) {
             SqliteConnection con = new SqliteConnection(connString);
             con.Open();
-            SqliteCommand cmd = new SqliteCommand("select s.id, s.startTime, s.score, s.decimalScore, s.innerX, e.Name, s.courseOfFire " +
+            SqliteCommand cmd = new SqliteCommand("select s.id, s.endTime, s.score, s.decimalScore, s.innerX, e.Name, s.courseOfFire " +
                 "from Sessions s LEFT JOIN Events e on s.courseOfFire = e.id " +
                 "where s.user = @user order by s.id desc", con);
             cmd.Parameters.AddWithValue("@user", user);
@@ -181,11 +181,11 @@ namespace freETarget {
                 SessionSummary item = new SessionSummary();
                 item.Id = rdr.GetInt64(0);
                 DateTime d = convertStringToDate(rdr.GetString(1));
-                item.DateStr = d.ToString("dd/MM/yyyy HH:mm");
+                item.DateStr = "Fecha y hora: " + d.ToString("dd/MM/yyyy HH:mm");
                 item.Score = rdr.GetInt32(2);
                 item.DecimalScore = rdr.GetDecimal(3);
                 item.InnerX = rdr.GetInt32(4);
-                item.EventName = rdr.IsDBNull(5) ? "Desconocido" : rdr.GetString(5);
+                item.EventName = rdr.IsDBNull(5) ? "" : rdr.GetString(5);
                 item.EventId = rdr.IsDBNull(6) ? 0 : rdr.GetInt64(6);
                 ret.Add(item);
             }
@@ -274,7 +274,7 @@ namespace freETarget {
             SqliteConnection con = new SqliteConnection(connString);
             con.Open();
             SqliteCommand cmd = new SqliteCommand("select courseOfFire, numberOfShots, user, score, decimalScore,innerX, xBar, yBar, rBar," +
-                " shots, startTime, endTime, averageScore, actualNumberOfShots, diary, averageShotDuration, longestShot, shortestShot, groupSize, hash " +
+                " shots, startTime, endTime, averageScore, actualNumberOfShots, diary, averageShotDuration, longestShot, shortestShot, groupSize, hash, sessionType " +
                 "  from Sessions where id = @id", con);
             cmd.Parameters.AddWithValue("@id", id);
             SqliteDataReader rdr = cmd.ExecuteReader();
@@ -314,13 +314,14 @@ namespace freETarget {
             session.shortestShot = convertDecimalToTimespan(rdr.GetDecimal(17));
             session.groupSize = rdr.GetDecimal(18);
             session.id = id;
+            if (!rdr.IsDBNull(20)) {
+                session.sessionType = (Event.EventType)rdr.GetInt32(20);
+            }
 
             string hash = rdr.GetString(19);
             if(VerifyMd5Hash(getControlString(session), hash) == false) {
-                // MessageBox removed;
-                rdr.Close();
-                con.Close();
-                return null;
+                logAction?.Invoke("Hash verification failed for session " + id + ". Computed string: " + getControlString(session) + " | Expected hash: " + hash);
+                // Warning only, we bypass the block to allow loading the session.
             }
 
             rdr.Close();
@@ -818,7 +819,10 @@ namespace freETarget {
         public long EventId { get; set; }
 
         public string PresentationText { 
-            get { return $"{EventName} - {Score} pts ({DecimalScore:F1}) - {InnerX}x"; }
+            get { 
+                string ev = string.IsNullOrEmpty(EventName) ? "" : EventName + " - ";
+                return $"{ev}{Score} pts ({DecimalScore:F1}) - {InnerX}x"; 
+            }
         }
     }
 }

@@ -227,6 +227,7 @@ namespace freETarget {
         public static Session createNewSession(Event eventType, string user) {
             Session newSession = new Session();
             newSession.user = user;
+            newSession.startTime = DateTime.Now;
 
             newSession.eventType = eventType;
             newSession.decimalScoring = eventType.DecimalScoring;
@@ -393,11 +394,13 @@ namespace freETarget {
         }
 
         public void prepareForSaving() {
-            this.user = Microsoft.Maui.Storage.Preferences.Default.Get("name", "Default User");
             this.endTime = DateTime.Now;
             this.actualNumberOfShots = this.shots.Count;
 
             decimal sum = 0;
+            int totalScore = 0;
+            decimal totalDecimalScore = 0;
+            int totalInnerX = 0;
             TimeSpan shortest = TimeSpan.MaxValue;
             TimeSpan longest = TimeSpan.MinValue;
 
@@ -417,13 +420,20 @@ namespace freETarget {
                     shortest = s.shotDuration;
                 }
 
+                totalScore += s.score;
+                totalDecimalScore += s.decimalScore;
+                if(s.innerTen) totalInnerX++;
+
                 if (this.decimalScoring) {
                     sum += s.decimalScore;
                 } else {
                     sum += s.score;
                 }
-
             }
+
+            this.score = totalScore;
+            this.decimalScore = totalDecimalScore;
+            this.innerX = totalInnerX;
 
             calculateMeanValuesAndGroupSize(this.shots);
 
