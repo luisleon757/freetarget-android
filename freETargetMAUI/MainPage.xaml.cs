@@ -114,15 +114,22 @@ public partial class MainPage : ContentPage
             ConnectButton.Text = "Conectar WiFi";
             ConnectButton.BackgroundColor = Color.FromArgb("#10B981"); // Green
             ConnectionStatusDot.Fill = Color.FromArgb("#EF4444"); // Red
+            ConnectionStatusLabel.Text = "Desconectado";
         }
         else
         {
+            ConnectionStatusLabel.Text = "Conectando...";
             await _connectionService.ConnectAsync();
             if (_connectionService.IsConnected)
             {
                 ConnectButton.Text = "Desconectar";
                 ConnectButton.BackgroundColor = Color.FromArgb("#EF4444"); // Red
                 ConnectionStatusDot.Fill = Color.FromArgb("#10B981"); // Green
+                ConnectionStatusLabel.Text = "Conectado";
+            }
+            else
+            {
+                ConnectionStatusLabel.Text = "Desconectado";
             }
         }
     }
@@ -327,6 +334,7 @@ public partial class MainPage : ContentPage
         _shotsUI.Clear();
         _shotCounter = 0;
         
+        int tempCount = 0;
         foreach (var shot in session.Shots)
         {
             _domainShots.Add(shot);
@@ -339,6 +347,14 @@ public partial class MainPage : ContentPage
                 IsLatest = false,
                 IsSum = false
             });
+            
+            tempCount++;
+            if (tempCount % 10 == 0)
+            {
+                var seriesShots = _domainShots.Skip(tempCount - 10).Take(10);
+                int intSum = seriesShots.Sum(s => s.score);
+                _shotsUI.Add(new ShotViewModel { IsSum = true, DisplayText = intSum.ToString() });
+            }
         }
         
         if (session.eventType != null && session.eventType.Target != null) {
