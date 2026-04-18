@@ -7,37 +7,55 @@
 
     <!-- Título Personalizado en Shell -->
     <Shell.TitleView>
-        <HorizontalStackLayout Padding="20,0" Spacing="35" VerticalOptions="Center">
-            <Label Text="freETarget" FontSize="19" FontAttributes="Bold" TextColor="White" VerticalOptions="Center" />
+        <Grid ColumnDefinitions="Auto, Auto, *, Auto" Padding="20,0" ColumnSpacing="20">
+            <!-- Título freETarget -->
+            <Label Grid.Column="0" Text="freETarget" FontSize="19" FontAttributes="Bold" TextColor="White" VerticalOptions="Center" />
             
-            <Border BackgroundColor="#1E293B" StrokeThickness="1" Stroke="#334155" Padding="15,0">
+            <!-- Controles (Luz y Tirador) -->
+            <HorizontalStackLayout Grid.Column="1" Spacing="25" VerticalOptions="Center">
+                <Border BackgroundColor="#1E293B" StrokeThickness="1" Stroke="#334155" Padding="15,0">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="20" />
+                    </Border.StrokeShape>
+                    <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                        <Label Text="💡 Luz:" VerticalOptions="Center" TextColor="#FCD34D" FontAttributes="Bold" FontSize="13" />
+                        <Picker x:Name="LightIntensityPicker" Title="%" WidthRequest="65" TextColor="#FDE68A" TitleColor="#64748B" SelectedIndexChanged="OnLightIntensityChanged" FontSize="14" HorizontalTextAlignment="Center">
+                            <Picker.Items>
+                                <x:String>0%</x:String>
+                                <x:String>25%</x:String>
+                                <x:String>50%</x:String>
+                                <x:String>75%</x:String>
+                                <x:String>99%</x:String>
+                            </Picker.Items>
+                        </Picker>
+                    </HorizontalStackLayout>
+                </Border>
+    
+                <Border BackgroundColor="#1E293B" StrokeThickness="1" Stroke="#334155" Padding="15,0">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="20" />
+                    </Border.StrokeShape>
+                    <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                        <Label Text="👤 Tirador:" VerticalOptions="Center" TextColor="#60A5FA" FontAttributes="Bold" FontSize="13" />
+                        <Picker x:Name="ShooterPicker" Title="Seleccionar" WidthRequest="160" TextColor="#93C5FD" TitleColor="#64748B" SelectedIndexChanged="OnShooterChanged" FontSize="14" HorizontalTextAlignment="Center" />
+                    </HorizontalStackLayout>
+                </Border>
+            </HorizontalStackLayout>
+            
+            <!-- Espacio vacío en Grid.Column="2" -->
+            
+            <!-- Reloj de 90 Minutos -->
+            <Border Grid.Column="3" BackgroundColor="#1E293B" StrokeThickness="1" Stroke="#334155" Padding="15,0" HorizontalOptions="End" VerticalOptions="Center">
                 <Border.StrokeShape>
                     <RoundRectangle CornerRadius="20" />
                 </Border.StrokeShape>
                 <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
-                    <Label Text="💡 Luz:" VerticalOptions="Center" TextColor="#FCD34D" FontAttributes="Bold" FontSize="13" />
-                    <Picker x:Name="LightIntensityPicker" Title="%" WidthRequest="65" TextColor="#FDE68A" TitleColor="#64748B" SelectedIndexChanged="OnLightIntensityChanged" FontSize="14" HorizontalTextAlignment="Center">
-                        <Picker.Items>
-                            <x:String>0%</x:String>
-                            <x:String>25%</x:String>
-                            <x:String>50%</x:String>
-                            <x:String>75%</x:String>
-                            <x:String>99%</x:String>
-                        </Picker.Items>
-                    </Picker>
+                    <Label Text="⏱️" VerticalOptions="Center" FontSize="20" />
+                    <Label x:Name="CountdownLabel" Text="01:30:00" TextColor="#F87171" FontAttributes="Bold" FontSize="26" VerticalOptions="Center" />
+                    <Button Text="▶/⏸" BackgroundColor="Transparent" FontSize="14" TextColor="White" Clicked="OnToggleTimerClicked" Padding="0" Margin="5,0,0,0" HeightRequest="30" />
                 </HorizontalStackLayout>
             </Border>
-
-            <Border BackgroundColor="#1E293B" StrokeThickness="1" Stroke="#334155" Padding="15,0">
-                <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="20" />
-                </Border.StrokeShape>
-                <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
-                    <Label Text="👤 Tirador:" VerticalOptions="Center" TextColor="#60A5FA" FontAttributes="Bold" FontSize="13" />
-                    <Picker x:Name="ShooterPicker" Title="Seleccionar" WidthRequest="160" TextColor="#93C5FD" TitleColor="#64748B" SelectedIndexChanged="OnShooterChanged" FontSize="14" HorizontalTextAlignment="Center" />
-                </HorizontalStackLayout>
-            </Border>
-        </HorizontalStackLayout>
+        </Grid>
     </Shell.TitleView>
 
     <!-- Aplicando tema claro, fondo Slate 50 -->

@@ -38,6 +38,7 @@ public class TargetConnectionService
         {
             OnConnectionStateChanged?.Invoke(this, "Conectando...");
             _client = new TcpClient();
+            _client.NoDelay = true; // Desactivar Nagle's Algorithm (fundamental para evitar demoras en tramas pequeñas)
             
             var connectTask = _client.ConnectAsync(IPAddress, Port);
             var timeoutTask = Task.Delay(8000); 
@@ -84,7 +85,8 @@ public class TargetConnectionService
         {
             try
             {
-                byte[] data = System.Text.Encoding.UTF8.GetBytes(message + "\r\n");
+                // Un doble salto de línea fuerza la limpieza del buffer serial de arduino antes del JSON
+                byte[] data = System.Text.Encoding.UTF8.GetBytes("\r\n" + message + "\r\n");
                 await _stream.WriteAsync(data, 0, data.Length);
                 await _stream.FlushAsync();
                 System.Diagnostics.Debug.WriteLine($"Enviado: {message}");

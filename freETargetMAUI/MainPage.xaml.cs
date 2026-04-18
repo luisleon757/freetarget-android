@@ -21,6 +21,8 @@ public partial class MainPage : ContentPage
     private Random _random = new Random();
     private TargetConnectionService _connectionService;
     private freETarget.StorageController _storageController;
+    private IDispatcherTimer _matchTimer;
+    private TimeSpan _countdownTime;
 
     public MainPage(freETarget.StorageController storageController)
     {
@@ -36,7 +38,40 @@ public partial class MainPage : ContentPage
         _connectionService.OnShotReceived += ConnectionService_OnShotReceived;
         _connectionService.OnRawDataReceived += ConnectionService_OnRawDataReceived;
         
+        _matchTimer = Application.Current.Dispatcher.CreateTimer();
+        _matchTimer.Interval = TimeSpan.FromSeconds(1);
+        _matchTimer.Tick += MatchTimer_Tick;
+        _countdownTime = TimeSpan.FromMinutes(90);
+
         SetupInitialEvent();
+    }
+
+    private void MatchTimer_Tick(object? sender, EventArgs e)
+    {
+        if (_countdownTime.TotalSeconds > 0)
+        {
+            _countdownTime = _countdownTime.Subtract(TimeSpan.FromSeconds(1));
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                CountdownLabel.Text = _countdownTime.ToString(@"hh\:mm\:ss");
+            });
+        }
+        else
+        {
+            _matchTimer.Stop();
+        }
+    }
+
+    private void OnToggleTimerClicked(object? sender, EventArgs e)
+    {
+        if (_matchTimer.IsRunning)
+        {
+            _matchTimer.Stop();
+        }
+        else
+        {
+            _matchTimer.Start();
+        }
     }
 
     private void SetupInitialEvent()
@@ -77,6 +112,12 @@ public partial class MainPage : ContentPage
 
     private async void OnEndSessionClicked(object? sender, EventArgs e)
     {
+        if (_matchTimer != null && _matchTimer.IsRunning) _matchTimer.Stop();
+        if (_currentSession != null)
+        {
+            Microsoft.Maui.Storage.Preferences.Default.Set($"Timer_{_currentSession.startTime.Ticks}", _countdownTime.TotalSeconds);
+        }
+
         if (_domainShots.Count > 0)
         {
             _currentSession.endTime = DateTime.Now;
@@ -299,6 +340,10 @@ public partial class MainPage : ContentPage
                 _shotCounter = 0;
                 UpdateUI();
                 
+                _countdownTime = TimeSpan.FromMinutes(90);
+                CountdownLabel.Text = _countdownTime.ToString(@"hh\:mm\:ss");
+                _matchTimer.Start();
+                
                 await DisplayAlert("Modo Competición", "La competición ha iniciado. Dispones de 60 disparos.", "Aceptar");
             }
         }
@@ -365,6 +410,14 @@ public partial class MainPage : ContentPage
         AppTargetDrawable.CurrentSession = _currentSession;
         
         UpdateUI();
+
+        if (session.sessionType == Event.EventType.Match)
+        {
+            double savedSeconds = Microsoft.Maui.Storage.Preferences.Default.Get($"Timer_{session.startTime.Ticks}", 90 * 60.0);
+            _countdownTime = TimeSpan.FromSeconds(savedSeconds);
+            CountdownLabel.Text = _countdownTime.ToString(@"hh\:mm\:ss");
+            _matchTimer.Start();
+        }
     }
 
     protected override async void OnAppearing()

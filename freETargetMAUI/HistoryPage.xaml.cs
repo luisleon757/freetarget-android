@@ -55,6 +55,20 @@ public partial class HistoryPage : ContentPage
         }
     }
 
+    private async void OnDeleteSessionClicked(object sender, EventArgs e)
+    {
+        var button = sender as Button;
+        if (button != null && button.CommandParameter is long sessionId)
+        {
+            bool answer = await DisplayAlert("Confirmar", "¿Seguro que quieres borrar esta sesión de forma permanente?", "Sí, Borrar", "Cancelar");
+            if (answer)
+            {
+                _storageController.deleteSession(sessionId);
+                RefreshList();
+            }
+        }
+    }
+
     private async void OnCloseClicked(object sender, EventArgs e)
     {
         await Navigation.PopModalAsync();

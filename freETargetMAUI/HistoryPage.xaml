@@ -24,12 +24,13 @@
                         <Border.Shadow>
                             <Shadow Brush="#000000" Opacity="0.05" Radius="10" Offset="0,4" />
                         </Border.Shadow>
-                        <Grid ColumnDefinitions="*, Auto" Padding="15">
+                        <Grid ColumnDefinitions="*, Auto, Auto" Padding="15">
                             <VerticalStackLayout Grid.Column="0" Spacing="4" VerticalOptions="Center">
                                 <Label Text="{Binding PresentationText}" FontSize="18" FontAttributes="Bold" TextColor="#2563EB" />
                                 <Label Text="{Binding DateStr}" FontSize="13" TextColor="#94A3B8" />
                             </VerticalStackLayout>
-                            <Button Grid.Column="1" Text="Cargar Sesión" BackgroundColor="#10B981" TextColor="White" CornerRadius="8" HeightRequest="40" Margin="10,0,0,0" VerticalOptions="Center" CommandParameter="{Binding Id}" Clicked="OnLoadSessionClicked" FontAttributes="Bold" />
+                            <Button Grid.Column="1" Text="Borrar" BackgroundColor="#EF4444" TextColor="White" CornerRadius="8" HeightRequest="40" Margin="10,0,0,0" VerticalOptions="Center" CommandParameter="{Binding Id}" Clicked="OnDeleteSessionClicked" FontAttributes="Bold" />
+                            <Button Grid.Column="2" Text="Cargar Sesión" BackgroundColor="#10B981" TextColor="White" CornerRadius="8" HeightRequest="40" Margin="10,0,0,0" VerticalOptions="Center" CommandParameter="{Binding Id}" Clicked="OnLoadSessionClicked" FontAttributes="Bold" />
                         </Grid>
                     </Border>
                 </DataTemplate>
