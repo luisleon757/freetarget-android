@@ -23,6 +23,7 @@ public partial class MainPage : ContentPage
     private freETarget.StorageController _storageController;
     private IDispatcherTimer _matchTimer;
     private TimeSpan _countdownTime;
+    private decimal _targetScaleFactor = 1.0m;
 
     public MainPage(freETarget.StorageController storageController)
     {
@@ -197,7 +198,9 @@ public partial class MainPage : ContentPage
     {
         MainThread.BeginInvokeOnMainThread(() =>
         {
-            ProcessRealShot(e.X, e.Y, e.ShotNumber);
+            decimal normalizedX = e.X / _targetScaleFactor;
+            decimal normalizedY = e.Y / _targetScaleFactor;
+            ProcessRealShot(normalizedX, normalizedY, e.ShotNumber);
         });
     }
 
@@ -271,8 +274,20 @@ public partial class MainPage : ContentPage
         if (!users.Contains("Invitado")) users.Insert(0, "Invitado");
         users.Add("+ Nuevo Tirador");
         
+        string lastShooter = Microsoft.Maui.Storage.Preferences.Default.Get("LastShooter", "Invitado");
+        if (users.Contains(lastShooter)) {
+            _currentShooterName = lastShooter;
+            if (_currentSession != null) {
+                _currentSession.user = _currentShooterName;
+            }
+        }
+        
         ShooterPicker.ItemsSource = users;
         ShooterPicker.SelectedItem = _currentShooterName;
+        
+        string lastScale = Microsoft.Maui.Storage.Preferences.Default.Get("LastScale", "100%");
+        ScalePicker.SelectedItem = lastScale;
+        SetScaleFactor(lastScale);
     }
 
     private void SaveCustomShooter(string newUser) {
@@ -319,10 +334,27 @@ public partial class MainPage : ContentPage
             _currentShooterName = selectedUser;
         }
         
+        Microsoft.Maui.Storage.Preferences.Default.Set("LastShooter", _currentShooterName);
+        
         if (_currentSession != null)
         {
             _currentSession.user = _currentShooterName;
         }
+    }
+
+    private void OnScaleChanged(object? sender, EventArgs e)
+    {
+        if (ScalePicker.SelectedIndex == -1) return;
+        string? selected = (string)ScalePicker.Items[ScalePicker.SelectedIndex];
+        SetScaleFactor(selected);
+        Microsoft.Maui.Storage.Preferences.Default.Set("LastScale", selected);
+    }
+
+    private void SetScaleFactor(string? scaleStr)
+    {
+        if (scaleStr == "80%") _targetScaleFactor = 0.8m;
+        else if (scaleStr == "60%") _targetScaleFactor = 0.6m;
+        else _targetScaleFactor = 1.0m;
     }
 
 

@@ -40,6 +40,22 @@
                         <Picker x:Name="ShooterPicker" Title="Seleccionar" WidthRequest="160" TextColor="#93C5FD" TitleColor="#64748B" SelectedIndexChanged="OnShooterChanged" FontSize="14" HorizontalTextAlignment="Center" />
                     </HorizontalStackLayout>
                 </Border>
+
+                <Border BackgroundColor="#1E293B" StrokeThickness="1" Stroke="#334155" Padding="15,0">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="20" />
+                    </Border.StrokeShape>
+                    <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                        <Label Text="📐 Escala:" VerticalOptions="Center" TextColor="#34D399" FontAttributes="Bold" FontSize="13" />
+                        <Picker x:Name="ScalePicker" Title="100%" WidthRequest="70" TextColor="#A7F3D0" TitleColor="#64748B" SelectedIndexChanged="OnScaleChanged" FontSize="14" HorizontalTextAlignment="Center">
+                            <Picker.Items>
+                                <x:String>100%</x:String>
+                                <x:String>80%</x:String>
+                                <x:String>60%</x:String>
+                            </Picker.Items>
+                        </Picker>
+                    </HorizontalStackLayout>
+                </Border>
             </HorizontalStackLayout>
             
             <!-- Espacio vacío en Grid.Column="2" -->
