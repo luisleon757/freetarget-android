@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Cronógrafo BLE</string>
+    <string name="perm_required">Se requieren permisos de Bluetooth y Ubicación.</string>
+    <string name="title_cronografo">CRONÓGRAFO BLE</string>
+    <string name="btn_scanning">Buscando...</string>
+    <string name="btn_scan">Buscar</string>
+    <string name="devices_available">Dispositivos Disponibles</string>
+    <string name="btn_connect">Conectar</string>
+    <string name="btn_disconnect">Desconectar</string>
+    <string name="energy_label">Energía: %1$s Julios</string>
+    <string name="title_velocity">VELOCIDAD</string>
+    <string name="title_energy">ENERGÍA</string>
+    <string name="settings_session">Ajustes de Sesión</string>
+    <string name="weight_label">Peso (g)</string>
+    <string name="btn_send">Enviar</string>
+    <string name="btn_reset">Reset</string>
+    <string name="history_title">Historial de Disparos</string>
+    <string name="stat_avg">Promedio</string>
+    <string name="stat_min">Mínima</string>
+    <string name="stat_max">Máxima</string>
+    
+    <string name="status_disconnected">Desconectado</string>
+    <string name="status_scanning">Escaneando dispositivos...</string>
+    <string name="status_scan_finished">Búsqueda finalizada</string>
+    <string name="status_connecting">Conectando a %1$s...</string>
+    <string name="status_connected">Conectado a %1$s</string>
+    <string name="status_weight_updated">Peso actualizado a %1$s</string>
+    <string name="status_session_reset">Sesión reiniciada</string>
+    <string name="default_device">Dispositivo</string>
+    
+    <string name="voice_shot_info">%1$s metros por segundo, y %2$s julios</string>
+    <string name="voice_decimal_con">%1$s con %2$s</string>
+    <string name="shot_number">Disparo #%1$s</string>
+    <string name="language_selector">Idioma</string>
+    <string name="lang_catalan">Català</string>
+    <string name="lang_spanish">Español</string>
+    <string name="lang_english">English</string>
+</resources>

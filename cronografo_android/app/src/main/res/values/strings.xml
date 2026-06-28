@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Cronògraf BLE</string>
+    <string name="perm_required">Es requereixen permisos de Bluetooth i Ubicació.</string>
+    <string name="title_cronografo">CRONÒGRAF BLE</string>
+    <string name="btn_scanning">Buscant...</string>
+    <string name="btn_scan">Buscar</string>
+    <string name="devices_available">Dispositius Disponibles</string>
+    <string name="btn_connect">Connectar</string>
+    <string name="btn_disconnect">Desconnectar</string>
+    <string name="energy_label">Energia: %1$s Joules</string>
+    <string name="title_velocity">VELOCITAT</string>
+    <string name="title_energy">ENERGIA</string>
+    <string name="settings_session">Ajustos de Sessió</string>
+    <string name="weight_label">Pes (g)</string>
+    <string name="btn_send">Enviar</string>
+    <string name="btn_reset">Reset</string>
+    <string name="history_title">Historial de Trets</string>
+    <string name="stat_avg">Mitjana</string>
+    <string name="stat_min">Mínima</string>
+    <string name="stat_max">Màxima</string>
+    
+    <string name="status_disconnected">Desconnectat</string>
+    <string name="status_scanning">Escanejant dispositius...</string>
+    <string name="status_scan_finished">Cerca finalitzada</string>
+    <string name="status_connecting">Connectant a %1$s...</string>
+    <string name="status_connected">Connectat a %1$s</string>
+    <string name="status_weight_updated">Pes actualitzat a %1$s</string>
+    <string name="status_session_reset">Sessió reiniciada</string>
+    <string name="default_device">Dispositiu</string>
+    
+    <string name="voice_shot_info">%1$s metres per segon, i %2$s joules</string>
+    <string name="voice_decimal_con">%1$s amb %2$s</string>
+    <string name="shot_number">Tret #%1$s</string>
+    <string name="language_selector">Idioma</string>
+    <string name="lang_catalan">Català</string>
+    <string name="lang_spanish">Español</string>
+    <string name="lang_english">English</string>
+</resources>

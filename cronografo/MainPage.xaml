@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:cronografo.ViewModels"
+             xmlns:models="clr-namespace:cronografo.Models"
+             xmlns:ble="clr-namespace:Plugin.BLE.Abstractions.Contracts;assembly=Plugin.BLE.Abstractions"
+             x:Class="cronografo.MainPage"
+             x:DataType="vm:MainViewModel"
+             BackgroundColor="#12121A">
+
+    <Grid RowDefinitions="Auto, *">
+        
+        <!-- CABECERA DE LA APLICACIÓN -->
+        <Border Grid.Row="0" BackgroundColor="#1E1E2C" StrokeThickness="0" Padding="16,12" Margin="0,0,0,8">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="0,0,16,16" />
+            </Border.StrokeShape>
+            <Border.Shadow>
+                <Shadow Brush="#000" Offset="0,4" Radius="8" Opacity="0.3" />
+            </Border.Shadow>
+            
+            <Grid ColumnDefinitions="*, Auto">
+                <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
+                    <Label Text="CRONÓGRAFO BLE" TextColor="#00F2FE" FontSize="18" FontAttributes="Bold" CharacterSpacing="2" />
+                    <Label Text="{Binding StatusText}" TextColor="#A0A0B0" FontSize="12" />
+                </VerticalStackLayout>
+                
+                <Button Grid.Column="1" 
+                        Command="{Binding ScanCommand}"
+                        TextColor="White"
+                        FontAttributes="Bold"
+                        CornerRadius="20"
+                        Padding="16,4"
+                        HeightRequest="40">
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button" Binding="{Binding IsScanning}" Value="True">
+                            <Setter Property="Text" Value="Buscando..." />
+                            <Setter Property="BackgroundColor" Value="#3E3E4C" />
+                        </DataTrigger>
+                        <DataTrigger TargetType="Button" Binding="{Binding IsScanning}" Value="False">
+                            <Setter Property="Text" Value="Buscar" />
+                            <Setter Property="BackgroundColor" Value="#4FACFE" />
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
+            </Grid>
+        </Border>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <ScrollView Grid.Row="1" Padding="16,8">
+            <VerticalStackLayout Spacing="16">
+                
+                <!-- SELECCIÓN DE DISPOSITIVOS -->
+                <Border BackgroundColor="#1E1E2C" StrokeThickness="0" Margin="0,0,0,8" Padding="12">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="12" />
+                    </Border.StrokeShape>
+                    <Border.Triggers>
+                        <DataTrigger TargetType="Border" Binding="{Binding IsConnected}" Value="True">
+                            <Setter Property="IsVisible" Value="False" />
+                        </DataTrigger>
+                        <DataTrigger TargetType="Border" Binding="{Binding IsConnected}" Value="False">
+                            <Setter Property="IsVisible" Value="True" />
+                        </DataTrigger>
+                    </Border.Triggers>
+                    
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Dispositivos Disponibles" TextColor="#E0E0E0" FontSize="14" FontAttributes="Bold" />
+                        <CollectionView ItemsSource="{Binding Devices}" HeightRequest="120">
+                            <CollectionView.EmptyView>
+                                <Label Text="No se han encontrado dispositivos. Haz clic en Buscar." TextColor="#808090" FontSize="12" HorizontalOptions="Center" VerticalOptions="Center" Margin="0,20"/>
+                            </CollectionView.EmptyView>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="ble:IDevice">
+                                    <Grid ColumnDefinitions="*, Auto" Padding="8,6">
+                                        <Label Grid.Column="0" Text="{Binding Name}" TextColor="White" FontSize="14" VerticalOptions="Center" />
+                                        <Button Grid.Column="1" Text="Conectar" 
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=ConnectCommand}" 
+                                                CommandParameter="{Binding .}"
+                                                BackgroundColor="#00F2FE" TextColor="#12121A" FontAttributes="Bold" CornerRadius="8" HeightRequest="32" Padding="12,0" />
+                                    </Grid>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- BOTÓN DE DESCONEXIÓN -->
+                <Button Text="Desconectar Cronógrafo" 
+                        Command="{Binding DisconnectCommand}"
+                        BackgroundColor="#FF4F58"
+                        TextColor="White"
+                        FontAttributes="Bold"
+                        CornerRadius="12"
+                        Margin="0,0,0,8"
+                        IsVisible="{Binding IsConnected}" />
+
+                <!-- TARJETA DE ÚLTIMO DISPARO (HERO SECTION) -->
+                <Border BackgroundColor="#1E1E2C" StrokeThickness="1" Stroke="#00F2FE" Padding="20">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="16" />
+                    </Border.StrokeShape>
+                    <Border.Shadow>
+                        <Shadow Brush="#00F2FE" Offset="0,0" Radius="15" Opacity="0.15" />
+                    </Border.Shadow>
+                    
+                    <VerticalStackLayout HorizontalOptions="Center" Spacing="6">
+                        <Label Text="{Binding LastShotNumber}" TextColor="#A0A0B0" FontSize="14" FontAttributes="Bold" HorizontalOptions="Center" CharacterSpacing="1" />
+                        
+                        <HorizontalStackLayout HorizontalOptions="Center" Spacing="8" VerticalOptions="End">
+                            <Label Text="{Binding LastShotVelocity}" TextColor="#00F2FE" FontSize="56" FontAttributes="Bold" VerticalOptions="End" />
+                            <Label Text="m/s" TextColor="#00F2FE" FontSize="20" FontAttributes="Bold" VerticalOptions="End" Margin="0,0,0,10" />
+                        </HorizontalStackLayout>
+                        
+                        <HorizontalStackLayout HorizontalOptions="Center" Spacing="6">
+                            <Label Text="Energía:" TextColor="#808090" FontSize="14" />
+                            <Label Text="{Binding LastShotEnergy}" TextColor="#E0E0E0" FontSize="14" FontAttributes="Bold" />
+                            <Label Text="Julios" TextColor="#E0E0E0" FontSize="14" />
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- ESTADÍSTICAS RÁPIDAS -->
+                <Grid ColumnDefinitions="*, *" ColumnSpacing="12" Margin="0,4">
+                    
+                    <!-- Tarjeta de Velocidad -->
+                    <Border Grid.Column="0" BackgroundColor="#1E1E2C" StrokeThickness="0" Padding="12">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="12" />
+                        </Border.StrokeShape>
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="VELOCIDAD (m/s)" TextColor="#4FACFE" FontSize="12" FontAttributes="Bold" HorizontalOptions="Center" />
+                            <Grid RowDefinitions="Auto, Auto, Auto" ColumnDefinitions="*, *" RowSpacing="4" Padding="0,4">
+                                <Label Grid.Row="0" Grid.Column="0" Text="Promedio" TextColor="#808090" FontSize="12" />
+                                <Label Grid.Row="0" Grid.Column="1" Text="{Binding AvgVelocity}" TextColor="White" FontSize="12" FontAttributes="Bold" HorizontalOptions="End" />
+                                
+                                <Label Grid.Row="1" Grid.Column="0" Text="Mínima" TextColor="#808090" FontSize="12" />
+                                <Label Grid.Row="1" Grid.Column="1" Text="{Binding MinVelocity}" TextColor="White" FontSize="12" FontAttributes="Bold" HorizontalOptions="End" />
+                                
+                                <Label Grid.Row="2" Grid.Column="0" Text="Máxima" TextColor="#808090" FontSize="12" />
+                                <Label Grid.Row="2" Grid.Column="1" Text="{Binding MaxVelocity}" TextColor="White" FontSize="12" FontAttributes="Bold" HorizontalOptions="End" />
+                            </Grid>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- Tarjeta de Energía -->
+                    <Border Grid.Column="1" BackgroundColor="#1E1E2C" StrokeThickness="0" Padding="12">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="12" />
+                        </Border.StrokeShape>
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="ENERGÍA (J)" TextColor="#00F2FE" FontSize="12" FontAttributes="Bold" HorizontalOptions="Center" />
+                            <Grid RowDefinitions="Auto, Auto, Auto" ColumnDefinitions="*, *" RowSpacing="4" Padding="0,4">
+                                <Label Grid.Row="0" Grid.Column="0" Text="Promedio" TextColor="#808090" FontSize="12" />
+                                <Label Grid.Row="0" Grid.Column="1" Text="{Binding AvgEnergy}" TextColor="White" FontSize="12" FontAttributes="Bold" HorizontalOptions="End" />
+                                
+                                <Label Grid.Row="1" Grid.Column="0" Text="Mínima" TextColor="#808090" FontSize="12" />
+                                <Label Grid.Row="1" Grid.Column="1" Text="{Binding MinEnergy}" TextColor="White" FontSize="12" FontAttributes="Bold" HorizontalOptions="End" />
+                                
+                                <Label Grid.Row="2" Grid.Column="0" Text="Máxima" TextColor="#808090" FontSize="12" />
+                                <Label Grid.Row="2" Grid.Column="1" Text="{Binding MaxEnergy}" TextColor="White" FontSize="12" FontAttributes="Bold" HorizontalOptions="End" />
+                            </Grid>
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
+
+                <!-- CONFIGURACIÓN DE MASA Y RESET -->
+                <Border BackgroundColor="#1E1E2C" StrokeThickness="0" Padding="16">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="12" />
+                    </Border.StrokeShape>
+                    
+                    <Grid RowDefinitions="Auto, Auto" ColumnDefinitions="*, Auto" RowSpacing="12" ColumnSpacing="12">
+                        <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Text="Ajustes de Sesión" TextColor="#E0E0E0" FontSize="14" FontAttributes="Bold" />
+                        
+                        <VerticalStackLayout Grid.Row="1" Grid.Column="0" Spacing="4">
+                            <Label Text="Peso del Balín (g):" TextColor="#808090" FontSize="11" />
+                            <Entry Text="{Binding PelletWeightText}" 
+                                   TextColor="White" 
+                                   BackgroundColor="#12121A" 
+                                   Keyboard="Numeric" 
+                                   HorizontalTextAlignment="Center"
+                                   HeightRequest="36" 
+                                   Margin="0" />
+                        </VerticalStackLayout>
+
+                        <HorizontalStackLayout Grid.Row="1" Grid.Column="1" Spacing="8" VerticalOptions="End">
+                            <Button Text="Enviar" 
+                                    Command="{Binding UpdateWeightCommand}" 
+                                    BackgroundColor="#4FACFE" 
+                                    TextColor="White" 
+                                    FontAttributes="Bold" 
+                                    CornerRadius="8" 
+                                    HeightRequest="36" 
+                                    Padding="16,0" />
+                            
+                            <Button Text="Reset" 
+                                    Command="{Binding ResetCommand}" 
+                                    BackgroundColor="#3E3E4C" 
+                                    TextColor="White" 
+                                    FontAttributes="Bold" 
+                                    CornerRadius="8" 
+                                    HeightRequest="36" 
+                                    Padding="16,0" />
+                        </HorizontalStackLayout>
+                    </Grid>
+                </Border>
+
+                <!-- HISTORIAL DE DISPAROS -->
+                <Border BackgroundColor="#1E1E2C" StrokeThickness="0" Padding="16">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="12" />
+                    </Border.StrokeShape>
+                    
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Historial de Disparos" TextColor="#E0E0E0" FontSize="14" FontAttributes="Bold" />
+                        
+                        <!-- Encabezados de Tabla -->
+                        <Grid ColumnDefinitions="50, *, *, 80" Padding="8,4" BackgroundColor="#12121A">
+                            <Label Grid.Column="0" Text="#" TextColor="#808090" FontSize="11" FontAttributes="Bold" />
+                            <Label Grid.Column="1" Text="Velocidad" TextColor="#808090" FontSize="11" FontAttributes="Bold" HorizontalOptions="Center" />
+                            <Label Grid.Column="2" Text="Energía" TextColor="#808090" FontSize="11" FontAttributes="Bold" HorizontalOptions="Center" />
+                            <Label Grid.Column="3" Text="Hora" TextColor="#808090" FontSize="11" FontAttributes="Bold" HorizontalOptions="End" />
+                        </Grid>
+
+                        <CollectionView ItemsSource="{Binding Shots}" HeightRequest="200">
+                            <CollectionView.EmptyView>
+                                <Label Text="No se han registrado disparos aún." TextColor="#808090" FontSize="12" HorizontalOptions="Center" VerticalOptions="Center" Margin="0,30" />
+                            </CollectionView.EmptyView>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="models:ShotModel">
+                                    <Grid ColumnDefinitions="50, *, *, 80" Padding="8,6">
+                                        <Label Grid.Column="0" Text="{Binding Number, StringFormat='#{0}'}" TextColor="White" FontSize="13" FontAttributes="Bold" VerticalOptions="Center" />
+                                        <Label Grid.Column="1" Text="{Binding DisplayVelocity}" TextColor="#00F2FE" FontSize="13" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" />
+                                        <Label Grid.Column="2" Text="{Binding DisplayEnergy}" TextColor="#E0E0E0" FontSize="13" HorizontalOptions="Center" VerticalOptions="Center" />
+                                        <Label Grid.Column="3" Text="{Binding DisplayTime}" TextColor="#808090" FontSize="12" HorizontalOptions="End" VerticalOptions="Center" />
+                                    </Grid>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
+                </Border>
+                
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+
+</ContentPage>

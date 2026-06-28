@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">BLE Chronograph</string>
+    <string name="perm_required">Bluetooth and Location permissions are required.</string>
+    <string name="title_cronografo">BLE CHRONOGRAPH</string>
+    <string name="btn_scanning">Scanning...</string>
+    <string name="btn_scan">Scan</string>
+    <string name="devices_available">Available Devices</string>
+    <string name="btn_connect">Connect</string>
+    <string name="btn_disconnect">Disconnect</string>
+    <string name="energy_label">Energy: %1$s Joules</string>
+    <string name="title_velocity">VELOCITY</string>
+    <string name="title_energy">ENERGY</string>
+    <string name="settings_session">Session Settings</string>
+    <string name="weight_label">Weight (g)</string>
+    <string name="btn_send">Send</string>
+    <string name="btn_reset">Reset</string>
+    <string name="history_title">Shot History</string>
+    <string name="stat_avg">Average</string>
+    <string name="stat_min">Minimum</string>
+    <string name="stat_max">Maximum</string>
+    
+    <string name="status_disconnected">Disconnected</string>
+    <string name="status_scanning">Scanning for devices...</string>
+    <string name="status_scan_finished">Scan finished</string>
+    <string name="status_connecting">Connecting to %1$s...</string>
+    <string name="status_connected">Connected to %1$s</string>
+    <string name="status_weight_updated">Weight updated to %1$s</string>
+    <string name="status_session_reset">Session reset</string>
+    <string name="default_device">Device</string>
+    
+    <string name="voice_shot_info">%1$s meters per second, and %2$s joules</string>
+    <string name="voice_decimal_con">%1$s point %2$s</string>
+    <string name="shot_number">Shot #%1$s</string>
+    <string name="language_selector">Language</string>
+    <string name="lang_catalan">Català</string>
+    <string name="lang_spanish">Español</string>
+    <string name="lang_english">English</string>
+</resources>
