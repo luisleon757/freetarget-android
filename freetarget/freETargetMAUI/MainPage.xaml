@@ -129,9 +129,9 @@
                         <Label Text="CURRENT EVENT: AIR PISTOL" FontSize="11" FontAttributes="Bold" TextColor="#94A3B8" CharacterSpacing="1.2" />
                         
                         <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
-                            <Label x:Name="IntegerScoreLabel" Text="0" FontSize="48" FontAttributes="Bold" TextColor="#2563EB" />
-                            <Label x:Name="ScoreLabel" Text="(0.0)" FontSize="22" FontAttributes="Bold" TextColor="#94A3B8" VerticalOptions="End" Margin="0,0,0,10"/>
-                            <Label Text="PTS" FontSize="16" FontAttributes="Bold" TextColor="#94A3B8" VerticalOptions="End" Margin="0,0,0,10"/>
+                            <Label x:Name="IntegerScoreLabel" Text="0" FontSize="72" FontAttributes="Bold" TextColor="#2563EB" />
+                            <Label x:Name="ScoreLabel" Text="(0.0)" FontSize="36" FontAttributes="Bold" TextColor="#94A3B8" VerticalOptions="End" Margin="0,0,0,10"/>
+                            <Label Text="PTS" FontSize="20" FontAttributes="Bold" TextColor="#94A3B8" VerticalOptions="End" Margin="0,0,0,10"/>
                         </HorizontalStackLayout>
                         
                         <Grid ColumnDefinitions="*, *" ColumnSpacing="8" Margin="0,10,0,0">
@@ -155,11 +155,11 @@
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
-                        <Border BackgroundColor="{Binding BackgroundColor}" Stroke="#E2E8F0" StrokeThickness="1" HeightRequest="38">
+                        <Border BackgroundColor="{Binding BackgroundColor}" Stroke="#E2E8F0" StrokeThickness="1" HeightRequest="44">
                             <Border.StrokeShape>
                                 <RoundRectangle CornerRadius="4" />
                             </Border.StrokeShape>
-                            <Label Text="{Binding DisplayText}" FontSize="11" FontAttributes="Bold" TextColor="{Binding TextColor}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" HorizontalOptions="Center" VerticalOptions="Center" />
+                            <Label Text="{Binding DisplayText}" FontSize="16" FontAttributes="Bold" TextColor="{Binding TextColor}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" HorizontalOptions="Center" VerticalOptions="Center" />
                         </Border>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
